@@ -52,11 +52,12 @@ module convbf16tomxi8 #(
 
     always_comb begin
         for(int i=0; i<k; i++) begin
-            shift_rnd #(
+            shift_rnd_rne #(
                 .width_i(9),
                 .width_o(8)
             ) u0_shift_rnd (
                 .i_num(p0_signed_mans[i]),
+                .i_shift(p0_d_shifts[i])
                 .o_rnd(p0_elems),
                 .o_ofl()
             );
