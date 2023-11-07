@@ -31,9 +31,6 @@ module convbf16tomxi8 #(
         .o_e_max(p0_e_max)
     );
 
-    assign o_sh_exp = p0_e_max;
-
-
     // Form output elements.
     logic [7:0] p0_d_shifts    [k];  // amount to shift by.
     logic [7:0] p0_extend_mans [k];  // Append implicit 1.
@@ -65,6 +62,8 @@ module convbf16tomxi8 #(
     end
 
     // Assign outputs.
+    assign o_sh_exp = p0_e_max;
+
     always_comb begin
         for (int i=0; i<k, i++) begin
             o_mx_vec[i] = p0_elems[i];

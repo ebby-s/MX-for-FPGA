@@ -10,29 +10,20 @@ module shift_rnd_rne #(
     output logic                            o_ofl
 );
 
-    // Find G, R and S bits for RNE rounding.
-    logic G;
+    // Find round and sticky bits for RNE rounding.
     logic R;
     logic S;
 
     always_comb begin
         if((i_shift+width_diff) == 1) begin
-            assign G = i_num[0];
-            assign R = 0
-            assign S = 0
-
-        end else if((i_shift+width_diff) == 2) begin
-            assign G = i_num[1];
             assign R = i_num[0];
             assign S = 0;
 
         end else if((i_shift+width_diff-1) <= (width_i-1)) begin
-            assign G =  i_num[i_shift+width_diff-1];
-            assign R =  i_num[i_shift+width_diff-2];
-            assign S = |i_num[i_shift+width_diff-3:0];
+            assign R =  i_num[i_shift+width_diff-1];
+            assign S = |i_num[i_shift+width_diff-2:0];
 
         end else begin
-            assign G = 0;
             assign R = 0;
             assign S = 0;
         end
@@ -48,7 +39,7 @@ module shift_rnd_rne #(
     logic signed [width_o:0] p0_shift_rnd;
     logic                    p0_ofl;
 
-    assign p0_rnd = G && (p0_shifted[0] || R || S);
+    assign p0_rnd = R && (p0_shifted[0] || S);
 
     assign p0_shift_rnd = p0_shifted + {{(width_o-1){1'b0}}, p0_rnd};
 
