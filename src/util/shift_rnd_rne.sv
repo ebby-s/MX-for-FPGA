@@ -11,23 +11,27 @@ module shift_rnd_rne #(
 );
 
     // Find round and sticky bits for RNE rounding.
+    logic [width_i-1:0] sticky_mask;
+
     logic R;
     logic S;
 
     always_comb begin
         if((i_shift+width_diff) == 1) begin
-            assign R = i_num[0];
-            assign S = 0;
+            R = i_num[0];
+            sticky_mask = 0;
 
         end else if((i_shift+width_diff-1) <= (width_i-1)) begin
-            assign R =  i_num[i_shift+width_diff-1];
-            assign S = |i_num[i_shift+width_diff-2:0];
+            R =  i_num[i_shift+width_diff-1];
+            sticky_mask = (1 << (i_shift+width_diff-1)) - 1;
 
         end else begin
-            assign R = 0;
-            assign S = 0;
+            R = 0;
+            sticky_mask = 0;
         end
     end
+
+    assign S = |(i_num & sticky_mask);
 
     // Shift input.
     logic signed [width_o-1:0] p0_shifted;
@@ -49,12 +53,14 @@ module shift_rnd_rne #(
     assign o_ofl = p0_ofl;
 
     // Clamp in case of overflow.
-    if(p0_ofl && p0_shift_rnd[width_o]) begin
-        assign o_rnd = {1'b1, {(width_o-1){1'b0}}};     // Max neg. integer.
-    end else if(p0_ofl && ~p0_shift_rnd[width_o]) begin
-        assign o_rnd = {1'b0, {(width_o-1){1'b1}}};     // Max pos. integer.
-    end else begin
-        assign o_rnd = p0_shift_rnd[width_o-1:0];
+    always_comb begin
+        if(p0_ofl && p0_shift_rnd[width_o]) begin
+            o_rnd = {1'b1, {(width_o-1){1'b0}}};     // Max neg. integer.
+        end else if(p0_ofl && ~p0_shift_rnd[width_o]) begin
+            o_rnd = {1'b0, {(width_o-1){1'b1}}};     // Max pos. integer.
+        end else begin
+            o_rnd = p0_shift_rnd[width_o-1:0];
+        end
     end
 
 
