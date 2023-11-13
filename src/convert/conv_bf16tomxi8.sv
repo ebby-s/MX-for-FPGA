@@ -49,31 +49,35 @@ module conv_bf16tomxi8 #(
     logic unsigned [7:0] p1_exps [k];
     logic unsigned [6:0] p1_mans [k];
 
-    for(genvar i=0; i<max_pl_depth; i++) begin : max_dly
-        logic [15:0] p0_bf16_vec [k];
+    if(max_pl_depth != 0) begin
 
-        for(genvar j=0; j<k; j++) begin
-            if(i != 0) begin
-                always_ff @(posedge i_clk) begin
-                    p0_bf16_vec[j] <= max_dly[i-1].p0_bf16_vec[j];
-                end
+        for(genvar i=0; i<max_pl_depth; i++) begin : max_dly
+            logic [15:0] p0_bf16_vec [k];
 
-            end else begin
-                always_ff @(posedge i_clk) begin
-                    p0_bf16_vec[j] <= i_bf16_vec[j];
+            for(genvar j=0; j<k; j++) begin
+                if(i != 0) begin
+                    always_ff @(posedge i_clk) begin
+                        p0_bf16_vec[j] <= max_dly[i-1].p0_bf16_vec[j];
+                    end
+
+                end else begin
+                    always_ff @(posedge i_clk) begin
+                        p0_bf16_vec[j] <= i_bf16_vec[j];
+                    end
                 end
             end
         end
-    end
 
-    always_comb begin
-        if(max_pl_depth != 0) begin
+        always_comb begin
             for (int i=0; i<k; i++) begin
                 p1_sgns[i] = max_dly[max_pl_depth-1].p0_bf16_vec[i][15];
                 p1_exps[i] = max_dly[max_pl_depth-1].p0_bf16_vec[i][14:7];
                 p1_mans[i] = max_dly[max_pl_depth-1].p0_bf16_vec[i][6:0];
             end
-        end else begin
+        end
+
+    end else begin
+        always_comb begin
             for (int i=0; i<k; i++) begin
                 p1_sgns[i] = i_bf16_vec[i][15];
                 p1_exps[i] = i_bf16_vec[i][14:7];
@@ -128,8 +132,7 @@ module conv_bf16tomxi8 #(
         ) u0_shift_rnd (
             .i_num(p2_signed_mans[i]),
             .i_shift(p2_d_shifts[i]),
-            .o_rnd(p2_elems[i]),
-            .o_ofl()
+            .o_rnd(p2_elems[i])
         );
     end
 
