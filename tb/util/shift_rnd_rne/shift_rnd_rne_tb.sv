@@ -53,7 +53,7 @@ module shift_rnd_rne_tb #(
                 #10
                 r_dut_out = $itor(p0_rnd_out)*(2.0**-(width_o-2.0));
 
-                if(r_ref_out != r_dut_out) begin
+                if((r_ref_out != r_dut_out) || $isunknown(p0_rnd_out)) begin
                     $display("Ref in:  %f", r_ref_in);
                     $display("Shift:   %d", p0_shift);
                     $display("DUT out: %f", r_dut_out);
