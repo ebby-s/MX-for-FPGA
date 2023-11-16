@@ -92,7 +92,7 @@ module conv_bf16tomxi8 #(
 
     always_comb begin
         for (int i=0; i<k; i++) begin
-            p1_extend_mans[i] = {|p1_exps[i], p1_mans[i]};
+            p1_extend_mans[i] = |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
             p1_signed_mans[i] = p1_sgns[i] ? -p1_extend_mans[i] : p1_extend_mans[i];
         end
     end
