@@ -34,12 +34,17 @@ module shift_rnd_rne_tb #(
     real r_ref_out;
     real r_dut_out;
 
+    int i;
+    int j;
+
     initial begin
         #1;
         $display("Starting -----");
+        $display("Width in:  %d", width_i);
+        $display("Width out: %d", width_o);
 
-        for(int i=0; i<(1<<width_i); i++) begin
-            for(int j=0; j<(1<<width_shift); j++) begin
+        for(i=0; i<(1<<width_i); i++) begin
+            for(j=0; j<(1<<width_shift); j++) begin
 
                 ref_in  = i;
                 ref_shift = j;
@@ -54,6 +59,7 @@ module shift_rnd_rne_tb #(
                 r_dut_out = $itor(p0_rnd_out)*(2.0**-(width_o-2.0));
 
                 if((r_ref_out != r_dut_out) || $isunknown(p0_rnd_out)) begin
+                    $display("Ref in:  %d", ref_in);
                     $display("Ref in:  %f", r_ref_in);
                     $display("Shift:   %d", p0_shift);
                     $display("DUT out: %f", r_dut_out);

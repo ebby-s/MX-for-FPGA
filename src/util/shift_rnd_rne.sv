@@ -13,23 +13,18 @@ module shift_rnd_rne #(
     localparam signed [width_o:0] max_neg_int = - max_pos_int;
 
     // Find round and sticky bits for RNE rounding.
-    logic [width_i-1:0] sticky_mask;
+    logic [width_i-2:0] sticky_mask;
 
     logic R;
     logic S;
 
+    assign sticky_mask = ~({(width_i-1){1'b1}} << (i_shift+width_diff-1));
+
     always_comb begin
-        if((i_shift+width_diff) == 1) begin
-            R = i_num[0];
-            sticky_mask = 0;
-
-        end else if((i_shift+width_diff-1) <= (width_i-1)) begin
-            R =  i_num[i_shift+width_diff-1];
-            sticky_mask = (1 << (i_shift+width_diff-1)) - 1;
-
-        end else begin
+        if(i_shift > width_o) begin
             R = 0;
-            sticky_mask = 0;
+        end else begin
+            R = i_num[i_shift+width_diff-1];
         end
     end
 
@@ -38,7 +33,10 @@ module shift_rnd_rne #(
     // Shift input.
     logic signed [width_o-1:0] p0_shifted;
 
-    assign p0_shifted = i_num >>> (i_shift+width_diff);
+    always_comb begin
+        p0_shifted = i_num[width_i-1:width_diff];
+        p0_shifted >>>= i_shift;
+    end
 
     // Form and add round bit.
     logic                    p0_rnd;
@@ -50,7 +48,7 @@ module shift_rnd_rne #(
 
     // Assign outputs. Clamp in case of overflow.
     always_comb begin
-        if((i_shift + width_diff) >= (width_o + 1)) begin
+        if(i_shift > width_o) begin
             o_rnd = 0;
         end else if(p0_shift_rnd > max_pos_int) begin
             o_rnd = max_pos_int;

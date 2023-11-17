@@ -143,6 +143,8 @@ module conv_bf16tomxi8_tb();
         #10
 
         $display("Starting -----");
+        $display("Width out: %d", bit_width);
+        $display("K:         %d", k);
 
         for(int i=0; i<(1<<16); i++) begin
             #10
