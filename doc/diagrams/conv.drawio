@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="izr5ojlLVmo8zyCvxxbJ" name="Page-1">
-        <mxGraphModel dx="786" dy="412" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
+        <mxGraphModel dx="839" dy="497" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -45,6 +45,9 @@
                             <mxPoint x="330" y="244.95"/>
                         </Array>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="606" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="503" target="512">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="503" value="[15:0] i_nums [k]" style="shape=offPageConnector;whiteSpace=wrap;html=1;rotation=0;direction=north;labelPosition=center;verticalLabelPosition=middle;align=left;verticalAlign=middle;size=0.16666666666666666;" parent="1" vertex="1">
                     <mxGeometry x="40" y="119.97000000000006" width="110" height="40" as="geometry"/>
@@ -387,7 +390,7 @@
                 <mxCell id="578" value="&lt;span style=&quot;text-align: left;&quot;&gt;[7:0] o_mx_exp [1]&lt;/span&gt;" style="shape=offPageConnector;whiteSpace=wrap;html=1;rotation=0;direction=south;labelPosition=center;verticalLabelPosition=middle;align=right;verticalAlign=middle;size=0.16666666666666666;" parent="1" vertex="1">
                     <mxGeometry x="680" y="769.95" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="605" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="580" target="577">
+                <mxCell id="605" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="580" target="577" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="580" value="u_fp_rnd" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
