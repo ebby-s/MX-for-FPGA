@@ -1,4 +1,4 @@
-module conv_bf16tomxi6 #(
+module conv_bf16tomxfp6 #(
     parameter exp_width = 3,
     parameter man_width = 2,
     parameter bit_width = 1 + exp_width + man_width,
@@ -132,8 +132,8 @@ module conv_bf16tomxi6 #(
         ) u0_fp_rnd (
             .i_num(p2_man_exts[i]),
             .i_shift(p2_d_shifts[i]),
-            .o_exp(p2_elems[i][width_o_man+width_o_exp-1:width_o_man]),
-            .o_man(p2_elems[i][width_o_man-1:0])
+            .o_exp(p2_elems[i][man_width+exp_width-1:man_width]),
+            .o_man(p2_elems[i][man_width-1:0])
         );
     end
 

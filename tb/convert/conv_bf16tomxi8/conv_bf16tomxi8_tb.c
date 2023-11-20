@@ -33,7 +33,7 @@ float rtni(float num){
 
         out = round(num); // Round away from zero.
 
-        if(out > 0){  // If output is positive, round towards zero.
+        if((out - num) > 0){ // If at or above halfway point.
             out -= 1;
         }
     }
@@ -114,6 +114,9 @@ int bf16tomxi8(float i_bf16, int i_scale, int width_diff, int bit_width){
     //     printf("Shifted: %d\n", shifted_num);
     //     printf("Rounded: %d\n", rounded);
     // }
+
+    if(i_bf16 == 0)
+        return 0;
 
     return rounded;
 };

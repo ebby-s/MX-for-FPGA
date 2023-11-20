@@ -26,6 +26,24 @@ float rne(float num){
     return out;
 };
 
+float rtni(float num){
+
+    float out = num;
+
+    if(round(num) != num){  // If rounding is necessary.
+
+        out = round(num); // Round away from zero.
+
+        if((out - num) > 0){ // If at or above halfway point.
+
+            out -= 1;
+
+        }
+    }
+
+    return out;
+};
+
 DPI_DLLESPEC
 float max_bf16(float i_bf16_vec[32], int k){
 
@@ -33,7 +51,7 @@ float max_bf16(float i_bf16_vec[32], int k){
 
     for(int i=0; i<k; i++){
         if(isfinite(i_bf16_vec[i]))
-            lrg = fmaxf(i_bf16_vec[i], lrg);
+            lrg = fmaxf(fabsf(i_bf16_vec[i]), lrg);
     }
 
     return lrg;
@@ -91,31 +109,36 @@ float fp_rnd_rne_ref(int i_num, int i_shift, int width_exp, int width_man){
 };
 
 DPI_DLLESPEC
-int bf16tomxfp6(float i_bf16, int i_scale){
+float bf16tomxfp6(float i_bf16, int i_scale, int width_exp, int width_man){
 
     // Calculate value of E8M0 scale.
-    float scale_val = powf(2, (i_scale-127));
+    double scale_val = pow(2, (i_scale-127));
 
-    // Calculate exp field of bf16 number.
-    int exp_val = log2f(fabsf(i_bf16));
+    // Sign of input.
+    float num_sign = signbit(i_bf16) ? -1 : 1;
 
-    if(fabsf(i_bf16) < 1)  // Round towards positive infinity.
-        exp_val--;
+    // Calculate largest power of 2 in bf16 number.
+    int exp_val = rtni(log2(fabs(i_bf16)));
 
     // Convert mantissa to int, multiply by 2^7 to keep full 7-bit mantissa.
-    int shifted_num = (i_bf16) * powf(2, 7-exp_val);
+    int shifted_num = fabs(i_bf16) * pow(2, 7-exp_val);
 
     // Round and shift.
-    int rounded = shift_rnd_rne_ref(shifted_num, log2f(scale_val)-exp_val, 1, 8);
+    float rounded = fp_rnd_rne_ref(shifted_num, log2(scale_val)-exp_val, width_exp, width_man);
 
-    // if(i_bf16 ==  0){
+    // if(i_bf16 == -4340760173735115897451494931228000256.0){
+    //     printf("Input:   %f\n", i_bf16);
     //     printf("lgScale: %f\n", log2f(scale_val));
+    //     printf("RTNI:    %f\n", log2(fabs(i_bf16)));
     //     printf("lgMSB:   %d\n", exp_val);
     //     printf("Shift:   %f\n", log2f(scale_val)-exp_val);
     //     printf("Shifted: %d\n", shifted_num);
     //     printf("Rounded: %d\n", rounded);
     // }
 
-    return rounded;
+    if(i_bf16 == 0)
+        return 0;
+
+    return rounded * num_sign;
 };
 
