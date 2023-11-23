@@ -35,18 +35,29 @@ module conv_bf16tomxfp6 #(
     end
 
     // Find E_max, the largest exponent in inputs.
+    logic [7:0] p0_e_max;
     logic [7:0] p1_e_max;
 
     unsigned_max #(
         .width(8),
         .length(k),
         .pl_freq(max_pl_freq),
-        .flop_output(max_flop_output)
+        .flop_output(0)
     ) u0_exp_max (
         .i_clk(i_clk),
         .i_exps(p0_exps),
-        .o_e_max(p1_e_max)
+        .o_e_max(p0_e_max)
     );
+
+    if(max_flop_output) begin
+
+        always_ff @(posedge i_clk) begin
+            p1_e_max <= (p0_e_max >= max_exp_elem) ? p0_e_max : max_exp_elem;
+        end
+
+    end else begin
+        assign p1_e_max = (p0_e_max >= max_exp_elem) ? p0_e_max : max_exp_elem;
+    end
 
     // Flop inputs to match delay of max component.
     logic                p1_sgns [k];
@@ -105,7 +116,7 @@ module conv_bf16tomxfp6 #(
             for (int i=0; i<k; i++) begin
                 p2_d_shifts[i] <= p1_e_max - p1_exps[i];
                 p2_sgns[i] <= p1_sgns[i];
-                p2_man_exts[i] <= {|p1_exps[i], p1_mans[i]};
+                p2_man_exts[i] <= |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
             end
         end
 
@@ -116,7 +127,7 @@ module conv_bf16tomxfp6 #(
         for (genvar i=0; i<k; i++) begin
             assign p2_d_shifts[i] = p1_e_max - p1_exps[i];
             assign p2_sgns[i] = p1_sgns[i];
-            assign p2_man_exts[i] = {|p1_exps[i], p1_mans[i]};
+            assign p2_man_exts[i] = |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
         end
     end
 

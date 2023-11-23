@@ -28,7 +28,6 @@ module conv_bf16tomxfp6_tb();
     import "DPI-C" pure function shortreal max_bf16(shortreal i_bf16_vec[32], int k);
     import "DPI-C" pure function int detect_nan(shortreal i_bf16_vec[32], int k);
 
-
     function shortreal mxfp6tosr(input logic [bit_width-1:0] i_mxfp6_num);
 
         logic [31:0] sr_bits;
@@ -50,9 +49,58 @@ module conv_bf16tomxfp6_tb();
 
     endfunction
 
-    function logic [15:0] set_denorm(input logic [15:0] i_num);
-        return i_num & 16'b1000000001111111;
-    endfunction
+
+    typedef logic [15:0] bf_16_vec_t [k];  // Type for vector of BF16 numbers.
+
+    class bf16_gen;                 // Random BF16 input.
+        rand logic [k-1:0] r_dnrm;  // Set individual elements to denorm.
+        rand logic [k-1:0] r_zero;  // Set individual elements to zero.
+    
+        rand logic r_dnrm_row;    // Set entire vector to denorms.
+        rand logic r_zero_row;    // Set entire vector to zeros.
+
+        rand logic [15:0] r_bf16_vec [k];
+
+        constraint c_dnrm_dist {
+            r_dnrm dist {
+            0 :/ 90,
+            1 :/ 10 };
+        }
+
+        constraint c_zero_dist {
+            r_zero dist {
+            0 :/ 90,
+            1 :/ 10 };
+        }
+
+        constraint c_dnrm_row_dist {
+            r_dnrm_row dist {
+            0 :/ 95,
+            1 :/  5 };
+        }
+
+        constraint c_zero_row_dist {
+            r_zero_row dist {
+            0 :/ 95,
+            1 :/  5 };
+        }
+
+        int count = 0;      // Add constraints to test interesting cases.
+
+        function void post_randomize();
+            count++;
+
+            for(int i=0; i<k; i++) begin
+                if(r_zero_row || r_zero[i]) begin
+                    r_bf16_vec[i] &= 16'h8000;
+                end else if(r_dnrm_row || r_dnrm[i]) begin
+                    r_bf16_vec[i] &= 16'h807f;
+                end
+            end
+
+        endfunction
+
+    endclass
 
 
     // DUT
@@ -119,10 +167,10 @@ module conv_bf16tomxfp6_tb();
             dut_out_dly2[j] = mxfp6tosr(p0_mx_vec_dly2[j]);
             dut_out_dly4[j] = mxfp6tosr(p0_mx_vec_dly4[j]);
 
-            // if(j == 4) begin
-            //     $display("Got ehre1: %d", p0_mx_vec_dly1[j]);
-            //     $display("Got ehre2: %f", dut_out_dly1[j]);
-            //     $display("Got ehre3: %d", $shortrealtobits(mxfp6tosr(p0_mx_vec_dly1[j])));
+            // if(dut_out_dly1[j] == 32768.0) begin
+            //     $display("DUT Out raw: %d", p0_mx_vec_dly1[j]);
+            //     $display("DUT out sr:  %f", dut_out_dly1[j]);
+            //     $display("DUT out srb: %d", $shortrealtobits(mxfp6tosr(p0_mx_vec_dly1[j])));
             // end
         end
     end
@@ -161,9 +209,13 @@ module conv_bf16tomxfp6_tb();
         end
     end
 
+    bf16_gen rand_gen;  // Generate shaped random input.
+
 
     initial begin
         #10
+
+        rand_gen = new();
 
         $display("Starting -----");
         $display("Width Exp: %d", width_exp);
@@ -171,15 +223,12 @@ module conv_bf16tomxfp6_tb();
         $display("K:         %d", k);
 
         for(int i=0; i<(1<<16); i++) begin
-            #10
+            #10 rand_gen.randomize();
 
             // Generate reference input, feed to DUT.
+            ref_in = rand_gen.r_bf16_vec;
+
             for(int j=0; j<k; j++) begin
-                if(!($random&32'h7)) begin
-                    ref_in[j] = set_denorm($random);
-                end else begin
-                    ref_in[j] = $random;
-                end
                 r_ref_in[j]  = $bitstoshortreal({ref_in[j], 16'h0});
             end
 
@@ -187,11 +236,18 @@ module conv_bf16tomxfp6_tb();
 
             // Calculate reference output.
             ref_scale = exp_from_sr(max_bf16(r_ref_in, k));
-            ref_scale -= max_exp_elem;
+            if(ref_scale >= max_exp_elem) begin
+                ref_scale -= max_exp_elem;
+            end else begin
+                ref_scale = 0;
+            end
 
             // Set block to NaN if any inputs are NaN.
-            if(detect_nan(r_ref_in, k))
+            if(detect_nan(r_ref_in, k)) begin
                 ref_scale = 8'hff;
+            end else begin
+                assert(ref_scale != 8'hff);
+            end
 
             for(int j=0; j<k; j++) begin
                 ref_out[j] = bf16tomxfp6(r_ref_in[j], ref_scale+max_exp_elem, width_exp, width_man);
@@ -218,16 +274,17 @@ module conv_bf16tomxfp6_tb();
                 end
             end
 
-            // if(i == 2) begin
-            //     failed = 10;
+            // if(i == 177) begin
+            //     failed = 1;
             if(failed < 0) begin
+                $display("Failed on: %d", i);
                 $display("Ref in:  %d", p0_bf16_vec[0]);
                 $display("Ref in:  %f", r_ref_in[0]);
                 $display("DUT out: %d", dut_scale_dly1);
                 $display("DUT out: %d", dut_scale_dly2);
                 $display("DUT out: %d", dut_scale_dly4);
                 $display("Ref out: %d  <- Mismatch!", ref_scale_delay[1]);
-                $display("Ref out: %d  <- Mismatch!", ref_scale_delay[4]);
+                $display("Ref out: %d  <- Mismatch!", ref_scale_delay[3]);
                 $display("Ref out: %d  <- Mismatch!", ref_scale_delay[5]);
                 $display("FAILED");
                 $finish();
