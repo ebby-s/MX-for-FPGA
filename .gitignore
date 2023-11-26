@@ -3,3 +3,5 @@ jgproject
 temp
 .vscode
 doc/img
+.Xil
+vivado*
