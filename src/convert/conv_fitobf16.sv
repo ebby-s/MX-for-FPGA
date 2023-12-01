@@ -1,5 +1,6 @@
 module conv_fitobf16 #(
-    parameter bit_width = 16
+    parameter bit_width = 16,
+    parameter in_bias = 0
 )(
     input  logic [bit_width-1:0] i_fi_num,
     output logic          [15:0] o_bf16
@@ -50,7 +51,7 @@ module conv_fitobf16 #(
     // Calculate exponent.
     logic [7:0] bf16_exp;
 
-    assign bf16_exp = (i_fi_num == 0) ? 0 : bit_width-1 - lz_num + rnd_ofl + exp_bias;
+    assign bf16_exp = (i_fi_num == 0) ? 0 : (bit_width-1 - lz_num + rnd_ofl + exp_bias - in_bias);
 
 
     // Assign output.
