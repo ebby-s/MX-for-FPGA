@@ -1,5 +1,6 @@
 #include "svdpi.h"
 #include <math.h>
+#include <stdlib.h>
 
 float rne(float num){
 

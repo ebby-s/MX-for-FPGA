@@ -1,5 +1,6 @@
 #include "svdpi.h"
 #include <math.h>
+#include <stdlib.h>
 
 double rne(double num){
 
