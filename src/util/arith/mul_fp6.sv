@@ -4,7 +4,7 @@ module mul_fp6 #(
     parameter bit_width = 1 + exp_width + man_width,
     parameter fi_width = man_width + 2,
     parameter fi_prd_width = 2 * fi_width,
-    parameter prd_width = 2 * ((1<<exp_width) + fi_width)
+    parameter prd_width = 2 * ((1<<exp_width) + man_width)
 )(
     input  logic signed [bit_width-1:0] i_op0,
     input  logic signed [bit_width-1:0] i_op1,

@@ -5,7 +5,7 @@ module dot_fp8 #(
     parameter e4m3_spec = (exp_width == 4) && (man_width == 3),
     parameter bit_width = 1 + exp_width + man_width,
     parameter fi_width  = man_width + 2,
-    parameter prd_width = 2 * ((1<<exp_width) + fi_width),
+    parameter prd_width = 2 * ((1<<exp_width) + man_width),
     parameter out_width = prd_width + $clog2(k)
 )(
     input  logic signed [bit_width-1:0] i_vec_a [k],

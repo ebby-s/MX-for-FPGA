@@ -21,7 +21,7 @@ module mul_fp6_tb();
     localparam man_width = 2;
     localparam bit_width = 1 + exp_width + man_width;
     localparam fi_width = man_width + 2;
-    localparam prd_width = 2 * ((1<<exp_width) + fi_width);
+    localparam prd_width = 2 * ((1<<exp_width) + man_width);
 
     function shortreal fp6tosr(input logic [bit_width-1:0] i_fp6_num);
 

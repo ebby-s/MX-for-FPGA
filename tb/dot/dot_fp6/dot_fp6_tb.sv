@@ -22,7 +22,7 @@ module dot_fp6_tb();
     localparam k         = 32;
     localparam bit_width = 1 + exp_width + man_width;
     localparam fi_width  = man_width + 2;
-    localparam prd_width = 2 * ((1<<exp_width) + fi_width);
+    localparam prd_width = 2 * ((1<<exp_width) + man_width);
     localparam out_width = prd_width + $clog2(k);
 
     function shortreal fp6tosr(input logic [bit_width-1:0] i_fp6_num);

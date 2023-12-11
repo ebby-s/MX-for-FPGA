@@ -4,7 +4,7 @@ module vec_mul_fp6 #(
     parameter length    = 32,
     parameter bit_width = 1 + exp_width + man_width,
     parameter fi_width  = man_width + 2,
-    parameter prd_width = 2 * ((1<<exp_width) + fi_width)
+    parameter prd_width = 2 * ((1<<exp_width) + man_width)
 )(
     input  logic signed [bit_width-1:0] i_vec_a [length],
     input  logic signed [bit_width-1:0] i_vec_b [length],
