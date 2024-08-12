@@ -1,4 +1,4 @@
-module dot_i8 #(
+module dot_int #(
     parameter bit_width = 8,
     parameter k         = 32,
     parameter prd_width = 2*bit_width,
@@ -12,7 +12,7 @@ module dot_i8 #(
     // Perform multiplications.
     logic signed [prd_width-1:0] p0_prd [k];
 
-    vec_mul_i8 #(
+    vec_mul_int #(
         .bit_width(bit_width),
         .length(k)
     ) u_vec_mul (
@@ -24,7 +24,7 @@ module dot_i8 #(
     // Calculate sum.
     logic signed [out_width-1:0] p0_sum;
 
-    vec_sum_i8 #(
+    vec_sum_int #(
         .bit_width(prd_width),
         .length(k)
     ) u_tree_add (

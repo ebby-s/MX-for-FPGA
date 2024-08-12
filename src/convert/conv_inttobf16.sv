@@ -1,4 +1,4 @@
-module conv_fitobf16 #(
+module conv_inttobf16 #(
     parameter bit_width = 16,
     parameter in_bias = 0
 )(
@@ -20,7 +20,7 @@ module conv_fitobf16 #(
     logic [$clog2(bit_width+1)-1:0] lz_num;
     logic [bit_width-1:0] aligned_num;
 
-    clz_i8 #(
+    clz_int #(
         .width_i(bit_width)
     ) u_clz (
         .i_num(u_fi_num),

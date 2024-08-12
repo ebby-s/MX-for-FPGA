@@ -1,4 +1,4 @@
-module conv_bf16tomxfp8 #(
+module conv_bf16tomxfp_spec #(
     parameter exp_width = 3,
     parameter man_width = 2,
     parameter bit_width = 1 + exp_width + man_width,

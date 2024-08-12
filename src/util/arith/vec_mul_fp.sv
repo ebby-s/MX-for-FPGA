@@ -1,7 +1,10 @@
-module vec_mul_i8 #(
-    parameter bit_width = 8,
+module vec_mul_fp #(
+    parameter exp_width = 5,
+    parameter man_width = 2,
     parameter length    = 32,
-    parameter prd_width = 2*bit_width
+    parameter bit_width = 1 + exp_width + man_width,
+    parameter fi_width  = man_width + 2,
+    parameter prd_width = 2 * ((1<<exp_width) + man_width)
 )(
     input  logic signed [bit_width-1:0] i_vec_a [length],
     input  logic signed [bit_width-1:0] i_vec_b [length],
@@ -13,8 +16,9 @@ module vec_mul_i8 #(
 
     for(genvar i=0; i<length; i++) begin : mul_loop
 
-        mul_i8 #(
-            .bit_width(bit_width)
+        mul_fp #(
+            .exp_width(exp_width),
+            .man_width(man_width)
         ) u_mul (
             .i_op0(i_vec_a[i]),
             .i_op1(i_vec_b[i]),

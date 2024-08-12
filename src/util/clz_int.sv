@@ -1,4 +1,4 @@
-module clz_i8 #(
+module clz_int #(
     parameter width_i = 8,
     parameter width_o = $clog2(width_i+1)
 )(

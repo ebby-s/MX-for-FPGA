@@ -1,4 +1,4 @@
-module mul_fp6 #(
+module mul_fp #(
     parameter exp_width = 5,
     parameter man_width = 2,
     parameter bit_width = 1 + exp_width + man_width,
@@ -37,7 +37,7 @@ module mul_fp6 #(
     // Multiply signed mantissas.
     logic signed [fi_prd_width-1:0] prd_fi;
 
-    mul_i8 #(
+    mul_int #(
         .bit_width(fi_width)
     ) u_int_mul (
         .i_op0(op0_signed_man),

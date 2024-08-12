@@ -1,4 +1,4 @@
-module vec_sum_i8 #(
+module vec_sum_int #(
     parameter bit_width  = 16,
     parameter length     = 32,
     parameter sum_width  = bit_width + $clog2(length),

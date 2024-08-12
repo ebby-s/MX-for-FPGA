@@ -1,4 +1,4 @@
-module dot_fp8 #(
+module dot_fp_spec #(
     parameter exp_width = 5,
     parameter man_width = 2,
     parameter k         = 32,
@@ -43,7 +43,7 @@ module dot_fp8 #(
     // Calculate dot product assuming no specials.
     logic signed [out_width-1:0] p0_sum;
 
-    dot_fp6 #(
+    dot_fp #(
         .exp_width(exp_width),
         .man_width(man_width),
         .k(k)

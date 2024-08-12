@@ -18,7 +18,7 @@ module fp_rnd_rne #(
     logic [$clog2(width_i):0] lz_num;
     logic [width_i-1:0] aligned_num;
 
-    clz_i8 #(
+    clz_int #(
         .width_i(width_i)
     ) u_clz (
         .i_num(i_num),

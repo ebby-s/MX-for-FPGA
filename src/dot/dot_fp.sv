@@ -1,4 +1,4 @@
-module dot_fp6 #(
+module dot_fp #(
     parameter exp_width = 5,
     parameter man_width = 2,
     parameter k         = 32,
@@ -15,7 +15,7 @@ module dot_fp6 #(
     // Perform multiplications.
     logic signed [prd_width-1:0] p0_prd [k];
 
-    vec_mul_fp6 #(
+    vec_mul_fp #(
         .exp_width(exp_width),
         .man_width(man_width),
         .length(k)
@@ -28,7 +28,7 @@ module dot_fp6 #(
     // Calculate sum.
     logic signed [out_width-1:0] p0_sum;
 
-    vec_sum_i8 #(
+    vec_sum_int #(
         .bit_width(prd_width),
         .length(k)
     ) u_tree_add (

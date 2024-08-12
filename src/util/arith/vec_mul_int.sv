@@ -1,10 +1,7 @@
-module vec_mul_fp6 #(
-    parameter exp_width = 5,
-    parameter man_width = 2,
+module vec_mul_int #(
+    parameter bit_width = 8,
     parameter length    = 32,
-    parameter bit_width = 1 + exp_width + man_width,
-    parameter fi_width  = man_width + 2,
-    parameter prd_width = 2 * ((1<<exp_width) + man_width)
+    parameter prd_width = 2*bit_width
 )(
     input  logic signed [bit_width-1:0] i_vec_a [length],
     input  logic signed [bit_width-1:0] i_vec_b [length],
@@ -16,9 +13,8 @@ module vec_mul_fp6 #(
 
     for(genvar i=0; i<length; i++) begin : mul_loop
 
-        mul_fp6 #(
-            .exp_width(exp_width),
-            .man_width(man_width)
+        mul_int #(
+            .bit_width(bit_width)
         ) u_mul (
             .i_op0(i_vec_a[i]),
             .i_op1(i_vec_b[i]),

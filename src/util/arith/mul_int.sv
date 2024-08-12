@@ -1,4 +1,4 @@
-module mul_i8 #(
+module mul_int #(
     parameter bit_width = 8,
     parameter prd_width = 2*bit_width
 )(

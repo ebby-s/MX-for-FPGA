@@ -1,5 +1,7 @@
-module conv_bf16tomxi8 #(
-    parameter bit_width = 8,   // Output int bit width.
+module conv_bf16tomxfp #(
+    parameter exp_width = 3,
+    parameter man_width = 2,
+    parameter bit_width = 1 + exp_width + man_width,
     parameter k = 32,          // Length of input vector.
     parameter freq_mhz = 400   // Target frequency, [0, 400].
 )(
@@ -17,6 +19,8 @@ module conv_bf16tomxi8 #(
     // Number of pipeline stages in u_exp_max.
     localparam max_pl_depth = ($clog2(k) / max_pl_freq) + max_flop_output;
 
+    localparam max_exp_elem = 1 << (exp_width-1);
+
     // Split input into sgn, exp, man fields.
     logic                p0_sgns [k];
     logic unsigned [7:0] p0_exps [k];
@@ -31,18 +35,29 @@ module conv_bf16tomxi8 #(
     end
 
     // Find E_max, the largest exponent in inputs.
+    logic [7:0] p0_e_max;
     logic [7:0] p1_e_max;
 
     unsigned_max #(
         .width(8),
         .length(k),
         .pl_freq(max_pl_freq),
-        .flop_output(max_flop_output)
+        .flop_output(0)
     ) u0_exp_max (
         .i_clk(i_clk),
         .i_exps(p0_exps),
-        .o_e_max(p1_e_max)
+        .o_e_max(p0_e_max)
     );
+
+    if(max_flop_output) begin
+
+        always_ff @(posedge i_clk) begin
+            p1_e_max <= (p0_e_max >= max_exp_elem) ? p0_e_max : max_exp_elem;
+        end
+
+    end else begin
+        assign p1_e_max = (p0_e_max >= max_exp_elem) ? p0_e_max : max_exp_elem;
+    end
 
     // Flop inputs to match delay of max component.
     logic                p1_sgns [k];
@@ -86,62 +101,59 @@ module conv_bf16tomxi8 #(
         end
     end
 
-    // Append implicit 1s and convert to 2's complement signed.
-    logic [7:0] p1_extend_mans [k];  // Append implicit 1.
-    logic [8:0] p1_signed_mans [k];  // Apply sign.
-
-    always_comb begin
-        for (int i=0; i<k; i++) begin
-            p1_extend_mans[i] = |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
-            p1_signed_mans[i] = p1_sgns[i] ? -p1_extend_mans[i] : p1_extend_mans[i];
-        end
-    end
-
     // Second pipeline stage. Calculate amount to shift by.
     logic [7:0] p2_e_max;
-    logic [8:0] p2_signed_mans [k];
-    logic [7:0] p2_d_shifts    [k];
+    logic [8:0] p2_sh_exp;
+    logic [7:0] p2_d_shifts [k];
+    logic                p2_sgns [k];
+    logic unsigned [7:0] p2_man_exts [k];
 
     if(pl_pre_shift_rnd) begin
         always_ff @(posedge i_clk) begin
-            p2_e_max <= p1_e_max;
+            p2_e_max  <= p1_e_max;
+            p2_sh_exp <= p1_e_max - max_exp_elem;
 
             for (int i=0; i<k; i++) begin
-                p2_signed_mans[i] <= p1_signed_mans[i];
-                p2_d_shifts[i]    <= p1_e_max - p1_exps[i];
+                p2_d_shifts[i] <= p1_e_max - p1_exps[i];
+                p2_sgns[i] <= p1_sgns[i];
+                p2_man_exts[i] <= |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
             end
         end
 
     end else begin
-        assign p2_e_max = p1_e_max;
+        assign p2_e_max  = p1_e_max;
+        assign p2_sh_exp = p1_e_max - max_exp_elem;
 
         for (genvar i=0; i<k; i++) begin
-            assign p2_signed_mans[i] = p1_signed_mans[i];
-            assign p2_d_shifts[i]    = p1_e_max - p1_exps[i];
+            assign p2_d_shifts[i] = p1_e_max - p1_exps[i];
+            assign p2_sgns[i] = p1_sgns[i];
+            assign p2_man_exts[i] = |p1_exps[i] ? {1'b1, p1_mans[i]} : {p1_mans[i], 1'b0};
         end
     end
 
     // Shift and round output elements.
-    logic [bit_width-1:0] p2_elems [k];
+    logic [bit_width-2:0] p2_elems [k];
 
     for(genvar i=0; i<k; i++) begin
-        shift_rnd_rne # (
-            .width_i(9),
-            .width_o(bit_width),
+        fp_rnd_rne # (
+            .width_i(8),
+            .width_o_exp(exp_width),
+            .width_o_man(man_width),
             .width_shift(8)
-        ) u0_shift_rnd (
-            .i_num(p2_signed_mans[i]),
+        ) u0_fp_rnd (
+            .i_num(p2_man_exts[i]),
             .i_shift(p2_d_shifts[i]),
-            .o_rnd(p2_elems[i])
+            .o_exp(p2_elems[i][man_width+exp_width-1:man_width]),
+            .o_man(p2_elems[i][man_width-1:0])
         );
     end
 
     // Assign outputs.
     always_ff @(posedge i_clk) begin
-        o_mx_exp <= p2_e_max;
+        o_mx_exp <= (p2_e_max == 8'hff) ? 8'hff : p2_sh_exp;
 
         for (int i=0; i<k; i++) begin
-            o_mx_vec[i] <= p2_elems[i];
+            o_mx_vec[i] <= {p2_sgns[i], p2_elems[i]};
         end
     end
 
