@@ -1,4 +1,4 @@
-module conv_bf16tomxi8_top #(
+module conv_bf16tomxint_top #(
     parameter bit_width = 8,
     parameter k = 32,
     parameter freq_mhz = 100
@@ -19,7 +19,7 @@ module conv_bf16tomxi8_top #(
     end
 
 
-    conv_bf16tomxi8 #(
+    conv_bf16tomxint #(
         .bit_width(bit_width),
         .k(k),
         .freq_mhz(freq_mhz)

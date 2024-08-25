@@ -1,4 +1,4 @@
-module dot_i8_top #(
+module dot_int_top #(
     parameter bit_width  = 8,
     parameter k = 32,
     parameter out_width = 2*bit_width + $clog2(k)
@@ -23,10 +23,10 @@ module dot_i8_top #(
 
     logic signed [out_width-1:0] p1_dp;
 
-    dot_i8 #(
+    dot_int #(
         .bit_width(bit_width),
         .k(k)
-    ) u0_dot_i8 (
+    ) u0_dot_int (
         .i_vec_a(p1_op0),
         .i_vec_b(p1_op1),
         .o_dp(p1_dp)

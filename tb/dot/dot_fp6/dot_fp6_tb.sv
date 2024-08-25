@@ -1,4 +1,4 @@
-module dot_fp6_tb();
+module dot_fp_tb();
 
     // Generate clock and reset.
     logic clk;
@@ -42,7 +42,7 @@ module dot_fp6_tb();
     logic signed [bit_width-1:0] i_op1 [k];
     logic signed [out_width-1:0] p0_dp_out;
 
-    dot_fp6 #(
+    dot_fp #(
         .exp_width(exp_width),
         .man_width(man_width),
         .k(k)

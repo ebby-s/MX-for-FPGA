@@ -1,4 +1,4 @@
-module conv_bf16tomxfp8_tb();
+module conv_bf16tomxfp_spec_tb();
 
     // Generate clock and reset.
     logic clk;
@@ -130,7 +130,7 @@ module conv_bf16tomxfp8_tb();
     logic signed [bit_width-1:0] p0_mx_vec_dly2 [32];
     logic signed [bit_width-1:0] p0_mx_vec_dly4 [32];
 
-    conv_bf16tomxfp8 #(
+    conv_bf16tomxfp_spec #(
         .exp_width(width_exp),
         .man_width(width_man),
         .k(k),
@@ -144,7 +144,7 @@ module conv_bf16tomxfp8_tb();
         .o_mx_exp(p0_mx_exp_dly1)
     );
 
-    conv_bf16tomxfp8 #(
+    conv_bf16tomxfp_spec #(
         .exp_width(width_exp),
         .man_width(width_man),
         .k(k),
@@ -158,7 +158,7 @@ module conv_bf16tomxfp8_tb();
         .o_mx_exp(p0_mx_exp_dly2)
     );
 
-    conv_bf16tomxfp8 #(
+    conv_bf16tomxfp_spec #(
         .exp_width(width_exp),
         .man_width(width_man),
         .k(k),

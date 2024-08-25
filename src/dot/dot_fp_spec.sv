@@ -47,7 +47,7 @@ module dot_fp_spec #(
         .exp_width(exp_width),
         .man_width(man_width),
         .k(k)
-    ) u_dot_fp6 (
+    ) u_dot_fp (
         .i_vec_a(i_vec_a),
         .i_vec_b(i_vec_b),
         .o_dp(p0_sum)

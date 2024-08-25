@@ -1,4 +1,4 @@
-module dot_i8_tb #(
+module dot_int_tb #(
     parameter bit_width  = 8,
     parameter k = 4,
     parameter out_width = 2*bit_width + $clog2(k)
@@ -13,10 +13,10 @@ module dot_i8_tb #(
     // DUT
     logic [out_width-1:0] p0_dp_out;
 
-    dot_i8 #(
+    dot_int #(
         .bit_width(bit_width),
         .k(k)
-    ) u0_dot_i8 (
+    ) u0_dot_int (
         .i_vec_a(i_op0),
         .i_vec_b(i_op1),
         .o_dp(p0_dp_out)

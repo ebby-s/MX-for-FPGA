@@ -6,7 +6,7 @@ else
     mkdir temp && cd temp
 endif
 
-xvlog --sv -svlog ../tb/util/mul_fp6/mul_fp6_tb.sv ../src/util/arith/mul_fp6.sv ../src/util/arith/mul_i8.sv
-xelab work.mul_fp6_tb -sv_lib dpi -R
+xvlog --sv -svlog ../tb/util/mul_fp/mul_fp_tb.sv ../src/util/arith/mul_fp.sv ../src/util/arith/mul_int.sv
+xelab work.mul_fp_tb -sv_lib dpi -R
 
 cd ..

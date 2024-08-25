@@ -1,4 +1,4 @@
-module conv_bf16tomxfp6_top #(
+module conv_bf16tomxfp_top #(
     parameter exp_width = 3,
     parameter man_width = 2,
     parameter bit_width = 1 + exp_width + man_width,
@@ -21,7 +21,7 @@ module conv_bf16tomxfp6_top #(
     end
 
 
-    conv_bf16tomxfp6 #(
+    conv_bf16tomxfp #(
         .exp_width(exp_width),
         .man_width(man_width),
         .k(k),

@@ -1,14 +1,14 @@
-module conv_fitobf16_tb #(
+module conv_inttobf16_tb #(
     parameter bit_width = 21
 )();
 
-    import "DPI-C" pure function real conv_fitobf16_ref(int i_fi_num, int bit_width);
+    import "DPI-C" pure function real conv_inttobf16_ref(int i_fi_num, int bit_width);
 
     // DUT
     logic [bit_width-1:0]   fi_num;
     logic          [15:0] bf16_num;
 
-    conv_fitobf16 # (
+    conv_inttobf16 # (
         .bit_width(bit_width)
     ) u_conv (
         .i_fi_num(fi_num),
@@ -34,7 +34,7 @@ module conv_fitobf16_tb #(
         for(i=0; i<(1<<(bit_width+1)); i++) begin
 
             ref_in  = i;
-            ref_out = conv_fitobf16_ref(ref_in, bit_width);
+            ref_out = conv_inttobf16_ref(ref_in, bit_width);
 
             fi_num = ref_in;
             #10

@@ -44,7 +44,7 @@ float rtni(float num){
 };
 
 DPI_DLLESPEC
-double conv_fitobf16_ref(int i_fi_num, int bit_width){
+double conv_inttobf16_ref(int i_fi_num, int bit_width){
 
     double float_num = i_fi_num;
 

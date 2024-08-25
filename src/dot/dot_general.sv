@@ -27,7 +27,7 @@ module dot_general #(
         dot_int #(
             .bit_width(bit_width),
             .k(k)
-        ) u_dot_i8 (
+        ) u_dot_int (
             .i_vec_a(i_X[i*k +: k]),
             .i_vec_b(i_Y[i*k +: k]),
             .o_dp(dot_out[i])

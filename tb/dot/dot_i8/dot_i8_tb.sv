@@ -1,4 +1,4 @@
-module dot_i8_tb();
+module dot_int_tb();
 
     // Generate clock and reset.
     logic clk;
@@ -26,7 +26,7 @@ module dot_i8_tb();
     logic signed [bit_width-1:0] i_op1 [k];
     logic signed [out_width-1:0] p0_dp_out;
 
-    dot_i8 #(
+    dot_int #(
         .bit_width(bit_width),
         .k(k)
     ) u0_dop_i8 (

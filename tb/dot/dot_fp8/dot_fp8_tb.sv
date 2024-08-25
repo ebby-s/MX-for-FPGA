@@ -1,4 +1,4 @@
-module dot_fp8_tb();
+module dot_fp_spec_tb();
 
     // Generate clock and reset.
     logic clk;
@@ -64,7 +64,7 @@ module dot_fp8_tb();
     logic signed [out_width-1:0] p0_dp_out;
     logic dut_nan;
 
-    dot_fp8 #(
+    dot_fp_spec #(
         .exp_width(exp_width),
         .man_width(man_width),
         .k(k),

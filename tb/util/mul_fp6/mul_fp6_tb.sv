@@ -1,4 +1,4 @@
-module mul_fp6_tb();
+module mul_fp_tb();
 
     // Generate clock and reset.
     logic clk;
@@ -40,7 +40,7 @@ module mul_fp6_tb();
     logic signed [bit_width-1:0] dut_op1;
     logic signed [prd_width-1:0] dut_prd;
 
-    mul_fp6 #(
+    mul_fp #(
         .exp_width(exp_width),
         .man_width(man_width)
     ) u_mul (
