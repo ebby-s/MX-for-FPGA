@@ -52,16 +52,31 @@ module dot_general #(
         logic signed        [8-1:0] p0_scale  [length>>(1+i)];
 
         for(genvar j=0; j<length>>(1+i); j++) begin
-            add_nrm #(
-                .int_w(dp_width)
-            ) u_add_nrm (
-                .i_op0(p0_add0[j]),
-                .i_op1(p0_add1[j]),
-                .i_scale0(p0_scale0[j]),
-                .i_scale1(p0_scale1[j]),
-                .out(p0_sum[j]),
-                .o_scale(p0_scale[j])
-            );
+            // First layer adds raw integer dot products, later layers add normalised mantissas.
+            if(i == 0) begin
+                add_nrm #(
+                    .int_w(dp_width),
+                    .implicit_man(0)
+                ) u_add_nrm (
+                    .i_op0(p0_add0[j]),
+                    .i_op1(p0_add1[j]),
+                    .i_scale0(p0_scale0[j]),
+                    .i_scale1(p0_scale1[j]),
+                    .out(p0_sum[j]),
+                    .o_scale(p0_scale[j])
+                );
+            end else begin
+                add_nrm #(
+                    .int_w(dp_width)
+                ) u_add_nrm (
+                    .i_op0(p0_add0[j]),
+                    .i_op1(p0_add1[j]),
+                    .i_scale0(p0_scale0[j]),
+                    .i_scale1(p0_scale1[j]),
+                    .out(p0_sum[j]),
+                    .o_scale(p0_scale[j])
+                );
+            end
         end
 
         // Connections to previous layers.
